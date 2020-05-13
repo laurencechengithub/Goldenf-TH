@@ -1,5 +1,5 @@
 //
-//  ThunderFireLoginDataModel.swift
+//  ArenaLoginDataModel.swift
 //  ThunderFire
 //
 //  Created by laurenceSecuNet on 4/6/20.

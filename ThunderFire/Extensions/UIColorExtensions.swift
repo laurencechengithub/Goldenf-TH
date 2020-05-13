@@ -23,6 +23,12 @@ extension UIColor {
         return UIColor(red: 194/255, green: 206/255, blue: 220/255, alpha: 1)
     }
     
+    open class var THLightGray:UIColor {
+        return UIColor(red: 134/255, green: 142/255, blue: 157/255, alpha: 1)
+    }
     
+//    open class var THDarkGray:UIColor {
+//        return UIColor(red: <#T##CGFloat#>, green: <#T##CGFloat#>, blue: <#T##CGFloat#>, alpha: <#T##CGFloat#>)
+//    }
     
 }

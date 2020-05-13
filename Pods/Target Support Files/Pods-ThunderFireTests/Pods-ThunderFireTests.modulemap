@@ -1,0 +1,6 @@
+framework module Pods_ThunderFireTests {
+  umbrella header "Pods-ThunderFireTests-umbrella.h"
+
+  export *
+  module * { export * }
+}

@@ -8,26 +8,48 @@
 
 import UIKit
 
-class EnterPointViewController: UIViewController {
+class EnterPointViewController: BaseViewController {
     
     var validUrl = String()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        
+        if let navigation = self.navigationController {
+               navigation.isNavigationBarHidden = true
+        }
         getValidPicURL()
-        doSomeLogoEffectHere()
+//        doSomeLogoEffectHere()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        
     }
     
     func doSomeLogoEffectHere() {
-        
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0 , execute: {
-//
-//        })
+        //dummy function for when VPN not connected
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0 , execute: {
+            self.toLoginSB()
+        })
         
     }
     
     func toLoginSB() {
-        performSegue(withIdentifier: "toLogin", sender: nil)
+        
+        let loginSB = UIStoryboard.init(name: "Login", bundle: nil)
+        let loginVC = loginSB.instantiateViewController(withIdentifier: "LoginViewController") as! LoginViewController
+        let decodedImage = GlobalFunction.sharedInstance.qrcodeImage(self.validUrl)
+        loginVC.validImage = decodedImage
+        
+        
+//        self.navi.pushViewController(loginVC, animated: true)
+        
+//        performSegue(withIdentifier: "toLogin", sender: nil)
+        
+ 
+        self.navigationController?.pushViewController(loginVC, animated: true)
+        
     }
     
     func getValidPicURL() {
@@ -43,21 +65,13 @@ class EnterPointViewController: UIViewController {
         switch segue.identifier {
         case "toLogin":
             let destinationVC = segue.destination as! LoginViewController
-            let decoded = self.validUrl.base64Decoded()
-            destinationVC.validUrl = decoded
+            let decodedImage = GlobalFunction.sharedInstance.qrcodeImage(self.validUrl)
+            destinationVC.validImage = decodedImage
         default:
             break
         }
     }
     
-    /*
-    // MARK: - Navigation
 
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }

@@ -9,13 +9,6 @@
 import Foundation
 import SwiftyJSON
 
-//{
-//    "code": 0,
-//    "data": {
-//        "url": "https://xj-mbs.prdasbbwla1.com/m/zh-cn/sports?theme=LH&sni=1wtxuaopschb5fbpasqvtlnx"
-//    }
-//}
-
 struct ThunderFireSportIndex {
     var code:Int
     var data:SportIndexData

@@ -34,8 +34,10 @@ class ForgetPssdViewController: UIViewController {
             switch pssdRetreiveType {
             case .byPhone:
                 phoneOrEmailTextField.placeholder = "请输入手机号码 11 码"
+                phoneOrEmailTextField.keyboardType = .phonePad
             case .byEmail:
                 phoneOrEmailTextField.placeholder = "请输入郵箱地址"
+                phoneOrEmailTextField.keyboardType = .emailAddress
             }
         }
     }

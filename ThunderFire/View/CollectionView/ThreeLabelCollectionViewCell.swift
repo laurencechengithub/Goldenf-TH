@@ -10,14 +10,13 @@ import UIKit
 
 class ThreeLabelCollectionViewCell: UICollectionViewCell {
     
-    var topLabel: UILabel!
-    var middleLabel: UILabel!
-    var bottomLabel: UILabel!
+    @IBOutlet weak var topLabel: UILabel!
+    @IBOutlet weak var middelLabel: UILabel!
+    @IBOutlet weak var bottomLabel: UILabel!
     
     
-    override class func awakeFromNib() {
+    override func awakeFromNib() {
         
     }
-    
-    
+
 }

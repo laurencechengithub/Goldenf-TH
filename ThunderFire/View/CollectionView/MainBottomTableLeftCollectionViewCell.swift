@@ -10,4 +10,14 @@ import UIKit
 
 class MainBottomTableLeftCollectionViewCell: UICollectionViewCell {
     
+    @IBOutlet weak var countryOneLabel: UILabel!
+    @IBOutlet weak var countryTwoLabel: UILabel!
+    @IBOutlet weak var drawLabel: UILabel!
+    
+    override class func awakeFromNib() {
+        
+    }
+    
+    
+    
 }

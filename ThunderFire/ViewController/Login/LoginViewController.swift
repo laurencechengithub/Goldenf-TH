@@ -44,7 +44,12 @@ class LoginViewController: BaseViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
+        acct.delegate = self
+        pssd.delegate = self
+        valid.delegate = self
         changeSegmentDisplayColor(selectedIndex: 0)
+        loginBtn.showsTouchWhenHighlighted = true
+        
     }
     
     @IBAction func segmentValueChange(_ sender: UISegmentedControl) {
@@ -67,17 +72,36 @@ class LoginViewController: BaseViewController {
     }
     
     @IBAction func loginBtnPressed(_ sender: UIButton) {
+////        ===test
+//        toMain()
+////        ======
         
-        toMain()
-        
-//        guard let acct = acct.text, let pssd = pssd.text else {
-//            return
-//        }
-//        //get arena login token
-//        let encodedPssd = GlobalFunction.sharedInstance.encodeMD5(string: pssd).uppercased()
-//        print(encodedPssd)
-//
-//        callArenaToken(user: acct, encodedPssd: encodedPssd)
+        // check acct
+        guard let acct = acct.text, let pssd = pssd.text else {
+            print("acct pssd textField = nil")
+            return
+        }
+
+        guard acct != "" else {
+            let cusAlertVC = CustomAlertViewController()
+            cusAlertVC.labelText = "帐号输入错误，请重新输入"
+            self.present(cusAlertVC, animated: false)
+            return
+        }
+
+        // check pssd
+        guard pssd != "" else {
+            let cusAlertVC = CustomAlertViewController()
+            cusAlertVC.labelText = "密码输入错误，请重新输入"
+            self.present(cusAlertVC, animated: false)
+            return
+        }
+
+        //get arena login token
+        let encodedPssd = GlobalFunction.sharedInstance.encodeMD5(string: pssd).uppercased()
+        print("MD5 encodedPssd : \(encodedPssd)")
+
+        callArenaToken(user: acct, encodedPssd: encodedPssd)
     
     }
     
@@ -88,9 +112,7 @@ class LoginViewController: BaseViewController {
     @IBAction func forgetPssdBtnTapped(_ sender: UIButton) {
         pushForgetPssd()
     }
-    
-    
-    
+
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         switch segue.identifier {
@@ -150,39 +172,65 @@ extension LoginViewController {
 //REMARK: Call Request
 extension LoginViewController {
     
-       func callArenaToken(user:String,encodedPssd:String) {
-           NetWorkManager.shareInstance.getLoginToken(userName: user, userPSSD: encodedPssd) { (loginData) in
-               if loginData.code == 0 {
-                   GlobalValue.userToken = loginData.data.token
-                   print("userLoginToken : \(GlobalValue.userToken)")
-                   self.callTFtoken(usertoken: GlobalValue.userToken)
-               }
-    
+    func callArenaToken(user:String,encodedPssd:String) {
+       NetWorkManager.shareInstance.getLoginToken(userName: user, userPSSD: encodedPssd) { (loginData) in
+           if loginData.code == 0 {
+               GlobalValue.userToken = loginData.data.token
+               print("userLoginToken : \(GlobalValue.userToken)")
+               self.callTFtoken(usertoken: GlobalValue.userToken)
+           }
+
+       }
+    }
+
+    func callTFtoken(usertoken:String) {
+       NetWorkManager.shareInstance.getThunderFireToken(arenaToken: usertoken) { (TFTokenData) in
+           
+           if TFTokenData.code == 0 {
+               GlobalValue.TFtoken = TFTokenData.data.esportToken
+               print("esportToken : \(GlobalValue.TFtoken)")
+               self.callTFUrl()
            }
        }
-       
-       func callTFtoken(usertoken:String) {
-           NetWorkManager.shareInstance.getThunderFireToken(arenaToken: usertoken) { (TFTokenData) in
-               
-               if TFTokenData.code == 0 {
-                   GlobalValue.TFtoken = TFTokenData.data.esportToken
-                   print("esportToken : \(GlobalValue.TFtoken)")
-                   self.callTFUrl()
-               }
-           }
-       }
+    }
 
     func callTFUrl() {
        
        NetWorkManager.shareInstance.getThunderFireURL(tokenValue: GlobalValue.userToken) { (TFURLData) in
            if TFURLData.code == 0 {
-               GlobalValue.TFUrl = TFURLData.data.url
-               print("體育url : \(TFURLData.data.url)")
-               self.toMain()
+            GlobalValue.TFUrl = TFURLData.data.url
+            print("體育url : \(TFURLData.data.url)")
+            self.getXJLaunchCookie()
            }
        }
     }
-
+    
+    func getXJLaunchCookie() {
+        
+        NetWorkManager.shareInstance.getXianJinCookie(url: GlobalValue.TFUrl) { (bool) in
+            if bool == true {
+                self.getXJMenu()
+            } else {
+                //alart view
+            }
+        }
+        
+        
+    }
+    
+    func getXJMenu() {
+        NetWorkManager.shareInstance.getMenu { (bool) in
+            if bool == true {
+                DispatchQueue.main.async {
+                    self.toMain()
+                }
+            } else {
+                //alart view
+            }
+        }
+    }
+    
+    
     func toMain() {
        //toMain
        performSegue(withIdentifier: "toMain", sender: nil)
@@ -197,10 +245,6 @@ extension LoginViewController {
     }
     
 }
-
-
-
-
 
 //REMARK: SelfDefine Functions
 extension LoginViewController {
@@ -226,8 +270,17 @@ extension LoginViewController {
             loginMethodSegment.subviews[0].layer.borderColor = UIColor.clear.cgColor
         }
     }
-    
 
+}
+
+
+extension LoginViewController: UITextFieldDelegate {
     
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        
+        textField.resignFirstResponder()
+        
+        return true
+    }
     
 }

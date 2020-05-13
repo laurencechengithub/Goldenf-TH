@@ -8,4 +8,10 @@
 
 import Foundation
 
-
+struct GlobalValue {
+    static var userToken = ""
+    static var TFtoken = ""
+    static var TFUrl = ""
+    static var XJcookiKeyValuePair = [String:String]()
+    
+}

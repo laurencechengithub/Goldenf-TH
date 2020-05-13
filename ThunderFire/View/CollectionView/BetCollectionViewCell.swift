@@ -37,8 +37,6 @@ class BetCollectionViewCell: UICollectionViewCell {
     
     
     func setCellLable(betType:[BetType],indexPath:IndexPath) {
-        
-        print(betType[indexPath.row])
 
         self.betCellLabel.text = betType[indexPath.row].stringValue
         self.betCellLabel.textColor = UIColor.white

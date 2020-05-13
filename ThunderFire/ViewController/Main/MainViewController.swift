@@ -155,71 +155,71 @@ enum SportType: Int, CaseIterable{
         get {
             switch self {
             case .soccer:
-                return "soccerB"
+                return "soccerW"
             case .basketBall:
-                return "basketballB"
+                return "basketballW"
             case .tennis:
-                return "tennisB"
+                return "tennisW"
             case .baseBall:
-                return "baseballB"
+                return "baseballW"
             case .golf:
-                return "golfB"
+                return "golfW"
             case .lottery:
-                return "lotteryB"
+                return "lotteryW"
             case .rugby:
-                return "footballB"
+                return "footballW"
             case .boxing:
-                return "boxingB"
+                return "boxingW"
             case .baminton:
-                return "badmintonB"
+                return "badmintonW"
             case .finance:
-                return "financialB"
+                return "financialW"
             case .missUniverse:
-                return "missUniverseB"
+                return "missUniverseW"
             case .volleyball:
-                return "volleyballB"
+                return "volleyballW"
             case .football:
-                return "footballB"
+                return "footballW"
             case .unique:
-                return "uniqueB"
+                return "uniqueW"
             case .handball:
-                return "handballB"
+                return "handballW"
             case .racing:
-                return "racingB"
+                return "racingW"
             case .cricket:
-                return "cricketB"
+                return "cricketW"
             case .beachSoccer:
-                return "beachSoccerB"
+                return "beachSoccerW"
             case .table:
-                return "tableB"
+                return "tableW"
             case .snooker:
-                return "snookerB"
+                return "snookerW"
             case .softball:
-                return "softballB"
+                return "softballW"
             case .esports:
-                return "esportsB"
+                return "esportsW"
             case .futsal:
-                return "futsalB"
+                return "futsalW"
             case .darts:
-                return "dartsB"
+                return "dartsW"
             case .hockey:
-                return "hockeyB"
+                return "hockeyW"
             case .beachVolleyball:
-                return "beachVolleyballB"//share the same pic
+                return "beachVolleyballW"//share the same pic
             case .waterball:
-                return "beachVolleyballB"//share the same pic
+                return "beachVolleyballW"//share the same pic
             case .fieldHockey:
-                return "fieldHockeyB"
+                return "fieldHockeyW"
             case .bicycle:
-                return "bicycleB"
+                return "bicycleW"
             case .gymnastics:
-                return "gymnasticsB"
+                return "gymnasticsW"
             case .athletics:
-                return "athleticsB"
+                return "athleticsW"
             case .sailboat:
-                return "sailboatB"
+                return "sailboatW"
             case .swim:
-                return "swimB"
+                return "swimW"
             }
         }
         
@@ -299,7 +299,11 @@ enum SportType: Int, CaseIterable{
     
 }
 
-
+struct cellData {
+    var open = Bool()
+    var title = String()
+    var sectionData = [String]()
+}
 
 
 class MainViewController: UIViewController {
@@ -309,7 +313,22 @@ class MainViewController: UIViewController {
     @IBOutlet weak var sportBtn: UIButton!
     @IBOutlet weak var memberPageBtn: UIButton!
     @IBOutlet weak var mainSegBottomView: UIView!
-
+    @IBOutlet weak var mainBottomTable: UITableView!
+    
+    @IBOutlet weak var bottomReturnTopBar: UIView!
+    @IBOutlet weak var returnTopBtn: UIButton!
+    @IBOutlet weak var returnTopBtnBottomConstraint: NSLayoutConstraint!
+    
+    
+    @IBOutlet weak var bottomMenuBar: UIView!
+    @IBOutlet weak var menuBtn: UIButton!
+    @IBOutlet weak var menuBtnLeadingConstraint: NSLayoutConstraint!
+    
+    @IBOutlet weak var menuFilterBtn: UIButton!
+    @IBOutlet weak var menuSpecialOfferBtn: UIButton!
+    @IBOutlet weak var menuOrderBtn: UIButton!
+    @IBOutlet weak var menuServeBtn: UIButton!
+    
     
     var betCollectionView:UICollectionView = {
         let flowLayout = UICollectionViewFlowLayout()
@@ -332,77 +351,173 @@ class MainViewController: UIViewController {
         collectionView.register(SportCollectionViewCell.self, forCellWithReuseIdentifier: "SportCollectionViewCell")
         return collectionView
     }()
-    
-    var theTableView: UITableView!
-    
-    var sectionTitleArray = [
-        section(sectionClass: "世界杯亞洲預賽",
-                name: ["dummy1"],
-                expanded: true),
-        section(sectionClass: "世界杯亞洲預賽",
-                name: ["dummy2"],
-                expanded: false),
-        section(sectionClass: "世界杯亞洲預賽",
-                name: ["dummy3"],
-                expanded: false)
-    ]
-    
 
-    
-    
+    private var scrollViewlastContentOffset: CGFloat = 0
     var mainSegBotViewLeadingConstraint:NSLayoutConstraint!
-    var tableViewSectionNumber = 3
+    var mainBottomtableViewData = [cellData]()
+    var isMenuBtnOpen = false
+    var isFirstTimeEnterMain = true
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        //Test : fake data==
+        mainBottomtableViewData = [
+                        cellData(open: true, title: "世界杯亞洲預賽", sectionData: ["cell1"]),
+                         cellData(open: true, title: "世界杯亞洲預賽", sectionData: ["cell1"]),
+                         cellData(open: true, title: "世界杯亞洲預賽", sectionData: ["cell1"]),
+                         cellData(open: true, title: "世界杯亞洲預賽", sectionData: ["cell1"])
+                        ]
+        //===
+        mainBottomTable.delegate = self
+        mainBottomTable.dataSource = self
+        mainBottomTable.bounces = false
         
 
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
         if let navi = navigationController {
-            navi.isNavigationBarHidden = true
-  
-        }
+            navi.isNavigationBarHidden = true }
         
         let screenSize = UIScreen.main.bounds
         
-        //set btn underLine
-        mainSegBotViewLeadingConstraint = mainSegBottomView.leadingAnchor.constraint(equalTo: self.eGameBtn.leadingAnchor, constant: 20)
+        //set main top two btn
+        mainSegBotViewLeadingConstraint = mainSegBottomView.leadingAnchor.constraint(equalTo: self.eGameBtn.leadingAnchor, constant: 82)
         mainSegBotViewLeadingConstraint.isActive = true
+        self.sportBtn.setTitleColor(UIColor.THGreen, for: .normal)
         
         //set collectionView
         setTwoCollectionView()
-    
+
+        //set bottomMenuBar
+        self.bottomMenuBar.layer.cornerRadius = 27
+        self.bottomMenuBar.backgroundColor = UIColor.darkGray
         
-        //set mainTableView
-        setTable()
-        self.theTableView.delegate = self
-        self.theTableView.dataSource = self
-        
-        
-        //test//
-        eGameBtn.backgroundColor = UIColor.darkGray
-        betCollectionView.backgroundColor = UIColor.darkGray
-        sportCollectionView.backgroundColor = UIColor.lightGray
-        
+        //set bottomReturnTopBar
+        bottomReturnTopBar.layer.cornerRadius = 27
+
         
     }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        //pre select to first cell
+        
+        if isFirstTimeEnterMain {
+            isFirstTimeEnterMain = false
+            let preSelect:IndexPath = IndexPath(row: 0, section: 0)
+            //        self.collectionView(betCollectionView, didSelectItemAt: preSelect)
+            self.collectionView(sportCollectionView, didSelectItemAt: preSelect)
+        }
+        
+    }
+    
+//REMARK: IBAction
+    
+    @IBAction func returnTopBtnTapped(_ sender: UIButton) {
+        
+        if let tableView = mainBottomTable {
+            tableView.setContentOffset(.zero, animated: true)
+            
+        }
+        
+    }
+    
     
     @IBAction func memberBtnTapped(_ sender: UIButton) {
+        // perform segue to memeber page
+    }
+    
+    @IBAction func menuBtnTapped(_ sender: UIButton) {
+       
+        if !isMenuBtnOpen {
+            isMenuBtnOpen = true
+            self.bottomMenuBar.backgroundColor = UIColor.THGreen
+            UIView.animate(withDuration: 0.25) {
+                self.menuBtnLeadingConstraint.constant = -340
+                self.menuBtn.setBackgroundImage(UIImage(named: "fabCloseWhite"), for: .normal)
+                self.returnTopBtnBottomConstraint.constant = -94
+            }
+        } else {
+            isMenuBtnOpen = false
+            
+            UIView.animate(withDuration: 0.25, animations: {
+                self.menuBtnLeadingConstraint.constant = -60
+                self.menuBtn.setBackgroundImage(UIImage(named: "fabmoreWhite"), for: .normal)
+            }) { (bool) in
+                self.bottomMenuBar.backgroundColor = UIColor.darkGray
+            }
+        }
+
+    }
+
+    @IBAction func eGameBtnTapped(_ sender: UIButton) {
+    
+        UIView.animate(withDuration: 0.3) {
+            self.eGameBtn.setTitleColor(UIColor.THGreen, for: .normal)
+            self.sportBtn.setTitleColor(UIColor.white, for: .normal)
+            self.mainSegBotViewLeadingConstraint.constant = 18
+            self.mainSegBottomView.layoutIfNeeded()
+        }
         
     }
     
-    func setTable() {
-        theTableView = UITableView()
-        self.view.addSubview(theTableView)
-        theTableView.translatesAutoresizingMaskIntoConstraints = false
-        theTableView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
-        theTableView.topAnchor.constraint(equalTo: self.sportCollectionView.bottomAnchor, constant: 10).isActive = true
-        theTableView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: 0).isActive = true
-        theTableView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: 0).isActive = true
-        theTableView.register(MainSectionOneLeftStaticTableCell.self, forCellReuseIdentifier: "SectionOneLeftOneStaticTableCell")
+    @IBAction func sportBtnTapped(_ sender: UIButton) {
+        
+        UIView.animate(withDuration: 0.3) {
+            self.sportBtn.setTitleColor(UIColor.THGreen, for: .normal)
+            self.eGameBtn.setTitleColor(UIColor.white, for: .normal)
+            self.mainSegBotViewLeadingConstraint.constant = 82
+            self.mainSegBottomView.layoutIfNeeded()
+         }
     }
+    
+    @IBAction func menuFilterBtnTapped(_ sender: UIButton) {
+        
+        performSegue(withIdentifier: "toMainFilter", sender: self)
+    }
+    
+    
+    @IBAction func menuSpecialOfferBtnTapped(_ sender: UIButton) {
+        
+        performSegue(withIdentifier: "toMainSpecialOffer", sender: self)
+        
+    }
+    
+    
+    @IBAction func menuOrderRecordBtnTapped(_ sender: UIButton) {
+        
+        performSegue(withIdentifier: "toMainOrderRecord", sender: self)
+        
+//        let orderRecordVC = self.storyboard?.instantiateViewController(identifier: "MainOrderRecord") as! MainOrderRecordViewController
+//
+//         self.navigationController?.pushViewController(orderRecordVC, animated: true)
+        
+    }
+    
+    
+    
+//REMARK: Prepare Segue
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        switch segue.identifier {
+        case "toMember":
+            print("prepare toMemeber")
+        case "toMainFilter":
+            print("prepare toMainFilter")
+        case "toMainSpecialOffer":
+            print("prepare toMainSpecialOffer")
+        case "toMainOrderRecord":
+            print("prepare toMainOrderRecord")
+        default:
+            break
+        }
+    }
+
+}
+
+//REMARK: Functions
+extension MainViewController {
     
     func setTwoCollectionView() {
 
@@ -423,42 +538,8 @@ class MainViewController: UIViewController {
         sportCollectionView.heightAnchor.constraint(equalToConstant: 70).isActive = true
     }
     
-    
-    
-    
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        switch segue.identifier {
-        case "toMember":
-            print("prepare toMemeber")
-        default:
-            break
-        }
-    }
-
-    @IBAction func eGameBtnTapped(_ sender: UIButton) {
-        
-        UIView.animate(withDuration: 0.3) {
-
-            self.mainSegBotViewLeadingConstraint.constant = 20
-            
-            self.mainSegBottomView.layoutIfNeeded()
-        }
-        
-    }
-    
-    @IBAction func sportBtnTapped(_ sender: UIButton) {
-        
-        UIView.animate(withDuration: 0.3) {
-
-             self.mainSegBotViewLeadingConstraint.constant = 82
-             self.mainSegBottomView.layoutIfNeeded()
-         }
-        
-        
-    }
-    
-
 }
+
 
 
 //REMARK: UICollectionView Delegate/Data
@@ -493,6 +574,12 @@ extension MainViewController:UICollectionViewDelegate,UICollectionViewDataSource
             
             cell.setCellData(sportTypeArry: SportType.allCases, indexPath: indexPath)
             
+            //pre selection
+            if indexPath.row == 0 {
+                collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .left)
+                cell.isSelected = true
+            }
+            
             return cell
         default:
             return UICollectionViewCell()
@@ -515,8 +602,6 @@ extension MainViewController:UICollectionViewDelegate,UICollectionViewDataSource
                 selectedCell.sportLabel.textColor = UIColor.THGreen
                 
             }
-   
-            
         default:
             break
         }
@@ -544,80 +629,159 @@ extension MainViewController:UICollectionViewDelegate,UICollectionViewDataSource
         default:
             break
         }
-        
-        
+    }
+}
+
+
+
+//REMARK: UITableView delegate/Data
+extension MainViewController:UITableViewDelegate,UITableViewDataSource {
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return mainBottomtableViewData.count
     }
     
     
-}
-
-extension MainViewController: UITableViewDelegate, UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if mainBottomtableViewData[section].open == true {
+              return mainBottomtableViewData[section].sectionData.count + 1
+          } else {
+              return 1
+          }
+    }
     
-    func numberOfSections(in tableView: UITableView) -> Int {
-                return sectionTitleArray.count
-            }
-
-            func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-                
-                return sectionTitleArray[section].name.count
-            }
-            
-            
-            func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-                return self.view.frame.height/10
-            }
-            
-            func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-                // Section中 row的高度
-                // 若expanded為false，row高度為0
-                
-                    if sectionTitleArray[indexPath.section].expanded == true {
-                        return 120
-                    } else {
-                        return 0
-                    }
-            }
-            
-            func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-                return 3
-            }
-            
-            func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-                
-                // 宣告每一個section header的view
-                let header = ExpandableHeaderView()
-                header.customInit(title: sectionTitleArray[section].sectionClass, section: section, delegate: self)
-          
-                return header
-            }
-            
-            
-            func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-                // 宣告每一個row
-                let cell = tableView.dequeueReusableCell(withIdentifier: "SectionOneLeftOneStaticTableCell") as! MainSectionOneLeftStaticTableCell
-                
-    //            if let cellLabel = cell.cellLabel {
-    //                cellLabel.text = sectionTitleArray[indexPath.section].name[indexPath.row]
-    //            }
-                
-                return cell
-            }
-    
-}
-
-
-extension MainViewController: ExpandableHeaderViewDelegate {
-    
-    
-    func toggleSectionWith(header: ExpandableHeaderView, andSection: Int) {
-        sectionTitleArray[andSection].expanded = !(sectionTitleArray[andSection].expanded)
-    
-        theTableView.beginUpdates()
-        for i in 0 ..< sectionTitleArray[andSection].name.count {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-            theTableView.reloadRows(at: [IndexPath(row: i, section: andSection)], with: .automatic)
+        if indexPath.row == 0 {
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: "MainBottomTableViewTitleCell", for: indexPath) as? MainBottomTableViewTitleCell else {
+                return UITableViewCell()
+            }
+            
+            cell.cellTitleLabel.text = mainBottomtableViewData[indexPath.section].title
+            if mainBottomtableViewData[indexPath.section].open == true, let imgView = cell.upDownImage {
+                imgView.image = UIImage(named: "cardOpenWhite")
+            } else if let imgView = cell.upDownImage {
+                imgView.image = UIImage(named: "cardCloseWhite")
+            }
+            
+            return cell
+        } else {
+            
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: "MainBottomTableViewContentCell", for: indexPath) as? MainBottomTableViewContentCell else {
+                    return UITableViewCell()
+                }
+            
+//            cell.cellLabel.text = tableViewData[indexPath.section].sectionData[indexPath.row - 1]
+            return cell
         }
-        theTableView.endUpdates()
+        
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if indexPath.row == 0 {
+            return 38
+        } else {
+            return 350
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if indexPath.row == 0 {
+                    
+                switch mainBottomtableViewData[indexPath.section].open {
+                case true:
+                    // if it's openned than close it
+                    mainBottomtableViewData[indexPath.section].open = false
+                    let sections = IndexSet.init(integer: indexPath.section)
+                    tableView.reloadSections(sections, with: .none)
+                case false:
+                    // if it's closed than open it
+                      mainBottomtableViewData[indexPath.section].open = true
+                      let sections = IndexSet.init(integer: indexPath.section)
+                      tableView.reloadSections(sections, with: .none)
+                }
+                    
+        } else {
+                self.mainBottomTable.isUserInteractionEnabled = false
+                    
+        }
+    }
+    
+}
+
+
+//REMARK: ScrollView Delegate
+
+extension MainViewController:UIScrollViewDelegate {
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        
+        UIView.animate(withDuration: 0.15) {
+            self.bottomMenuBar.alpha = 0.3
+            self.menuBtn.alpha = 0.3
+        }
+        
+        if (scrollView.contentOffset.y + 1) >= (scrollView.contentSize.height - scrollView.frame.height) {
+            //bottom
+            self.returnTopBtnBottomConstraint.constant = 34
+        }
+
+        if scrollView.contentOffset.y <= 1 {
+            //top
+            self.bottomMenuBar.alpha = 1
+            self.menuBtn.alpha = 1
+            self.returnTopBtnBottomConstraint.constant = -94
+
+        }
+        
+        if scrollView.contentOffset.y > 1 && scrollView.contentOffset.y < (scrollView.contentSize.height - scrollView.frame.height) {
+            //scrolling
+            
+            self.returnTopBtnBottomConstraint.constant = -94
+            
+        }
+        //under developing ==== V
+//        var constant:CGFloat = -94.0
+//        let offsetValue = (scrollViewlastContentOffset * 0.5)
+//
+//        if (self.scrollViewlastContentOffset > scrollView.contentOffset.y) {
+//            print("up")
+//            //火箭圖 constant 越來越接近-94
+//
+//            if constant > -94 {
+//                constant = constant - offsetValue
+////                self.returnTopBtnBottomConstraint.constant = constant
+//            } else {
+//                constant = -94
+////                self.returnTopBtnBottomConstraint.constant = constant
+//            }
+//
+//            print(constant)
+//
+//        } else if (self.scrollViewlastContentOffset < scrollView.contentOffset.y) {
+//            print("down")
+//
+//            //火箭圖 constant 越來越大 接近34
+//            if constant < 34 {
+//                constant = constant + offsetValue
+//            } else {
+//                constant = 34
+//            }
+//
+//            print(constant)
+//        }
+//
+//
+//        self.scrollViewlastContentOffset = scrollView.contentOffset.y
+        //under developing ====
+    }
+    
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        
+        UIView.animate(withDuration: 0.15) {
+            self.bottomMenuBar.alpha = 1
+            self.menuBtn.alpha = 1
+        }
         
     }
     

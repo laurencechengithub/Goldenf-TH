@@ -15,7 +15,7 @@ class TwoLabelCollectionViewCell: UICollectionViewCell {
     
     override class func awakeFromNib() {
           
-      }
+    }
     
     
 }

@@ -7,3 +7,24 @@
 //
 
 import Foundation
+import SwiftyJSON
+
+struct RenewToken {
+    var code:Int
+    var data:RenewTokenData
+    
+    init(fromJson json:JSON) {
+        self.code = json["code"].intValue
+        self.data = RenewTokenData(fromJson: json["data"])
+    }
+    
+}
+
+struct RenewTokenData {
+    var token:String
+    
+    init(fromJson json:JSON) {
+        self.token = json["token"].stringValue
+    }
+    
+}

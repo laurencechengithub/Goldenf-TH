@@ -10,8 +10,8 @@ import UIKit
 
 class TwoLargeLabelCollectionViewCell: UICollectionViewCell {
     
-    
-    
+    @IBOutlet weak var topLabel: UILabel!
+    @IBOutlet weak var bottomLabel: UILabel!
     
     override class func awakeFromNib() {
           
